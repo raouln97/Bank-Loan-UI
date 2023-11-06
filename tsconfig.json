@@ -1,0 +1,14 @@
+{
+    // "extends": "@tsconfig/node18/tsconfig.json",
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.tsx"
+    ],
+    "compilerOptions": {
+      "composite": true,
+      "module": "ESNext",
+      "moduleResolution": "Bundler",
+      "types": ["node"]
+    }
+  }
+  
