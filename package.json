@@ -11,6 +11,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "@types/moment-timezone": "^0.5.30",
+    "express": "^4.18.2",
     "material-react-table": "^2.0.2",
     "moment": "^2.29.4",
     "react": "^18.2.0",
@@ -22,11 +23,14 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "node server.js",
+    "heroku-postbuild": "react-scripts build",
+    "dev": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
-  },
+  }
+  ,
   "eslintConfig": {
     "extends": [
       "react-app",
