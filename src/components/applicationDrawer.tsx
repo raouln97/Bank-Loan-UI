@@ -58,23 +58,32 @@ export const ApplicationDrawer: React.FC<CreateApplicationModalProps>  = ({open,
     };
 
     const fetchData = async () => {
-        setLoading(true)
-        const response: LoanResponse = await getData(`${BACKEND_URL}applications?id=${applicationId}`)
-        setApplication(response)
-        if (response) {
-            console.log('HIT!');
-            setLoanProgress((response.loanAmount - response.balanceAmount) / response.loanAmount * 100);
+        try {
+            setLoading(true);
+            const response = await getData(`${BACKEND_URL}applications?id=${applicationId}`);
+            
+            const fetchedApplication = response;
+            
+            setApplication(fetchedApplication);
+            if (fetchedApplication) {
+                console.log('HIT!');
+                setLoanProgress((fetchedApplication.loanAmount - fetchedApplication.balanceAmount) / fetchedApplication.loanAmount * 100);
+            }
+    
+            const paymentHistoryResponse = await getData(`${BACKEND_URL}payments?id=${applicationId}`);
+            setPaymentHistory(paymentHistoryResponse);
+    
+            const productRes = await getData(`${BACKEND_URL}products?id=${productId}`);
+            if (productRes && fetchedApplication) {
+                const [productDetails] = productRes.productDetails.filter((detail) => detail._id === fetchedApplication.productDetailsId);
+                setProduct(productDetails);
+            }
+        } catch (error) {
+            console.error("An error occurred while fetching data", error);
+        } finally {
+            setLoading(false);
         }
-        const paymentHistoryResponse: PaymentHistoryDTO[] = await getData(`${BACKEND_URL}payments?id=${applicationId}`)
-        setPaymentHistory(paymentHistoryResponse)
-
-        const productRes: ProductListDTO = await getData(`${BACKEND_URL}products?id=${productId}`)
-        if (productRes){
-            const [productDetails] = productRes.productDetails.filter((detail) => detail._id === application?.productDetailsId)
-            setProduct(productDetails)
-        }
-        setLoading(false)
-    }
+    };  
 
     useEffect(() => {
         if (open) {
