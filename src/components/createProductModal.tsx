@@ -51,7 +51,7 @@ const { fields, append, remove } = useFieldArray({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Box marginBottom={2}>
+      <Box marginBottom={2} marginTop={1}>
             <Controller
             name="name"
             control={control}
