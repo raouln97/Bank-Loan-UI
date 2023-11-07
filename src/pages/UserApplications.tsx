@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogTitle, Grid} from "@mui/material"
+import { Dialog, DialogContent, DialogTitle, Grid, useMediaQuery, useTheme} from "@mui/material"
 import { MaterialTable } from "../components/materialTable"
 import React, { useEffect, useMemo, useState } from "react"
 import { MRT_ColumnDef } from "material-react-table";
@@ -19,7 +19,9 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 export const UserApplications: React.FC<UserApplicationsProps> = ({ context }) =>{
     const [getLoansResponse, setGetLoansResponse] = useState([])
     const [refreshLoading, setRefreshLoading] = useState(false)
-    const [isModalOpen, setIsModalOpen] = useState(false)    
+    const [isModalOpen, setIsModalOpen] = useState(false) 
+    const theme = useTheme();
+    const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));   
 
 
     const fetchData = async () => {
@@ -98,10 +100,10 @@ export const UserApplications: React.FC<UserApplicationsProps> = ({ context }) =
     return (
         <Grid margin='20px'>
             <MaterialTable  data={getLoansResponse ?? []} handleRefresh={handleRefresh} columns={columns!} refreshLoading={refreshLoading} handleOpenModal={handleOpenModal} handleDrawerClose={fetchData} isAdmin={context.isAdmin}/>
-                <Dialog open={isModalOpen} onClose={handleCloseModal} maxWidth="md" fullWidth style={{justifyContent: 'center', display:'flex', overflow: 'hidden'}}>
+                <Dialog open={isModalOpen} onClose={handleCloseModal} maxWidth='md' fullWidth style={{justifyContent: 'center', display:'flex', overflow: 'hidden'}}>
                     <DialogTitle>{!context.isAdmin ? "Loan Application" : "Create New Product"}</DialogTitle>
                     <DialogContent
-                    sx={{ width: '30vw', background: 'white'}}
+                    sx={{ width:{ xs: '90vw', sm: '70vw', md: '50vw', lg: '30vw' }, background: 'white'}}
                     >
                       {!context.isAdmin? 
                         <CreateApplicationForm handleCloseModal={handleCloseModal} /> :

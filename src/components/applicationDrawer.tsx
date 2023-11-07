@@ -1,4 +1,4 @@
-import { Button, Drawer, FormControlLabel, Grid, IconButton, LinearProgress, MenuItem, Paper, Radio, RadioGroup, Select, TextField, Theme, Tooltip, Typography, styled } from "@mui/material"
+import { Button, Drawer, FormControlLabel, Grid, IconButton, LinearProgress, MenuItem, Paper, Radio, RadioGroup, Select, TextField, Theme, Tooltip, Typography, styled, useMediaQuery, useTheme } from "@mui/material"
 import React, { useEffect, useState } from "react"
 import { getData, postData } from "../services/fetchService"
 import { formatDate } from "../services/dateTimeService"
@@ -20,6 +20,9 @@ export const ApplicationDrawer: React.FC<CreateApplicationModalProps>  = ({open,
     const [customAmount, setCustomAmount] = useState('');
     const [loanProgress, setLoanProgress] = useState(0)
     const [paymentHistory, setPaymentHistory]= useState<PaymentHistoryDTO[]>([])
+    const theme = useTheme();
+    const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
 
     const ColoredLinearProgress = styled(LinearProgress)(({ theme }: { theme: Theme }) => ({
         height: 10,
@@ -76,13 +79,17 @@ export const ApplicationDrawer: React.FC<CreateApplicationModalProps>  = ({open,
           hideBackdrop: true,
           keepMounted: true, 
         }}
+        sx={{
+            display: { xs: 'block', sm: 'none' },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: fullScreen ? '100%' : 240 },
+          }}
         >
             <Grid style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <IconButton onClick={setClose}>
                     <Close />
                 </IconButton>
             </Grid>
-            <Paper style={{ width: '50vw', height: '100%', padding: '16px' }}>
+            <Paper style={{ width: fullScreen? '100%' : '50vw', height: '100%', padding: '16px' }}>
                 <Grid item container flexDirection='row' display='flex' spacing={2}>
                     <Grid item xs={7} container flexDirection='column' display='flex' borderRight='0.5px Solid #ccc' style={{overflowX: 'hidden', overflowY: 'auto'}}>
                         {application &&
