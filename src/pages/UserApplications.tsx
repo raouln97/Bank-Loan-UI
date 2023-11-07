@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogTitle, Grid, useMediaQuery, useTheme} from "@mui/material"
+import { Dialog, DialogContent, DialogTitle, Grid} from "@mui/material"
 import { MaterialTable } from "../components/materialTable"
 import React, { useEffect, useMemo, useState } from "react"
 import { MRT_ColumnDef } from "material-react-table";
@@ -19,9 +19,7 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 export const UserApplications: React.FC<UserApplicationsProps> = ({ context }) =>{
     const [getLoansResponse, setGetLoansResponse] = useState([])
     const [refreshLoading, setRefreshLoading] = useState(false)
-    const [isModalOpen, setIsModalOpen] = useState(false) 
-    const theme = useTheme();
-    const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));   
+    const [isModalOpen, setIsModalOpen] = useState(false)  
 
 
     const fetchData = async () => {

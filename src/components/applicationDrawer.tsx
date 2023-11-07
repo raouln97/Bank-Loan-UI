@@ -2,11 +2,11 @@ import { Button, CircularProgress, Drawer, FormControlLabel, Grid, IconButton, L
 import React, { useEffect, useState } from "react"
 import { getData, postData } from "../services/fetchService"
 import { addMonthsFormat, formatDate } from "../services/dateTimeService"
-import { BankLoanInterface, LoanResponse, PaymentHistoryDTO, ProductDetailsDTO, ProductListDTO, ProductType } from "../common.dto"
+import { BankLoanInterface, LoanResponse, PaymentHistoryDTO, ProductDetailsDTO, ProductListDTO, SelectedApplicationType } from "../common.dto"
 import { Close } from "@mui/icons-material"
 
 interface CreateApplicationModalProps{
-    applicationId: string
+    selectedApplicationDetails: SelectedApplicationType
     open: boolean
     setClose: () => void
     isAdmin: boolean
@@ -14,7 +14,7 @@ interface CreateApplicationModalProps{
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
-export const ApplicationDrawer: React.FC<CreateApplicationModalProps>  = ({open, applicationId, setClose, isAdmin}) => {
+export const ApplicationDrawer: React.FC<CreateApplicationModalProps>  = ({open, selectedApplicationDetails, setClose, isAdmin}) => {
     const [application, setApplication] = useState<LoanResponse>()
     const [paymentOption, setPaymentOption] = useState('monthlyRepayment');
     const [customAmount, setCustomAmount] = useState('');
@@ -24,6 +24,7 @@ export const ApplicationDrawer: React.FC<CreateApplicationModalProps>  = ({open,
     const [loading, setLoading] = useState(false)
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+    const {applicationId, productId} = selectedApplicationDetails
 
 
     const ColoredLinearProgress = styled(LinearProgress)(({ theme }: { theme: Theme }) => ({
@@ -67,7 +68,7 @@ export const ApplicationDrawer: React.FC<CreateApplicationModalProps>  = ({open,
         const paymentHistoryResponse: PaymentHistoryDTO[] = await getData(`${BACKEND_URL}payments?id=${applicationId}`)
         setPaymentHistory(paymentHistoryResponse)
 
-        const productRes: ProductListDTO = await getData(`${BACKEND_URL}products?id=${application?.productId}`)
+        const productRes: ProductListDTO = await getData(`${BACKEND_URL}products?id=${productId}`)
         if (productRes){
             const [productDetails] = productRes.productDetails.filter((detail) => detail._id === application?.productDetailsId)
             setProduct(productDetails)

@@ -47,3 +47,8 @@ export interface ProductListDTO  {
     productDetails: ProductDetailsDTO[],
     __v: number
 }
+
+export interface SelectedApplicationType {
+    applicationId: string
+    productId: string
+  }

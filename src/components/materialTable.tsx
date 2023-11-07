@@ -6,7 +6,7 @@ import { MaterialReactTable, useMaterialReactTable, MRT_GlobalFilterTextField as
   import { FaMap } from "react-icons/fa6";
   import { IoIosRefresh } from "react-icons/io";
 import { ApplicationDrawer } from "./applicationDrawer";
-import { LoanResponse } from "../common.dto";
+import { LoanResponse, SelectedApplicationType } from "../common.dto";
 
   interface MaterialTableProps {
     data: LoanResponse[];
@@ -23,10 +23,10 @@ export const MaterialTable: React.FC<MaterialTableProps> = ({ data, handleRefres
     const [showColumns, setshowColumns] = useState(false)
     const [showSearchBox, setShowSearchBox] = useState(false)
     const [openDrawer, setIsOpenDrawer] = useState(false)
-    const [selectedApplicationId, setSelectedApplicationId]=useState('')
+    const [selectedApplicationDetails, setSelectedApplicationDetails]=useState<SelectedApplicationType>()
 
-    const handleDrawerModalOpen = (applicationId:string) => {
-            setSelectedApplicationId(applicationId)
+    const handleDrawerModalOpen = (applicationId:string, productId: string) => {
+      setSelectedApplicationDetails({applicationId, productId})
           if (openDrawer) {
             setIsOpenDrawer(false);
           }
@@ -64,7 +64,7 @@ export const MaterialTable: React.FC<MaterialTableProps> = ({ data, handleRefres
         },
         muiTableBodyRowProps: ({ row }) => ({
             onClick: () => {
-                handleDrawerModalOpen(row.original._id);
+                handleDrawerModalOpen(row.original._id, row.original.productId);
             },
             sx: {
               cursor: 'pointer',
@@ -121,7 +121,9 @@ export const MaterialTable: React.FC<MaterialTableProps> = ({ data, handleRefres
       return (
         <>
          <MaterialReactTable table={table} />
-         <ApplicationDrawer open={openDrawer} applicationId={selectedApplicationId} setClose={handleDrawerModalClose} isAdmin={isAdmin} />
+         {selectedApplicationDetails &&
+          <ApplicationDrawer open={openDrawer} selectedApplicationDetails={selectedApplicationDetails} setClose={handleDrawerModalClose} isAdmin={isAdmin}/>
+        }  
         </>
       )
 }
