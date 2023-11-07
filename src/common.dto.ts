@@ -33,3 +33,17 @@ export interface PaymentHistoryDTO {
     paymentAmount: number,
     paymentDate: string,
 }
+
+export interface ProductDetailsDTO{
+            loanTerm: number,
+            interestRate: number,
+            _id: string
+}
+
+export interface ProductListDTO  {
+    _id: string,
+    name: string,
+    type: string,
+    productDetails: ProductDetailsDTO[],
+    __v: number
+}

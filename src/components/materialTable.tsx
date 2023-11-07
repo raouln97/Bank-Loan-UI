@@ -77,7 +77,7 @@ export const MaterialTable: React.FC<MaterialTableProps> = ({ data, handleRefres
                 color="primary"
                       onClick={handleOpenModal}
                   >
-                      + Create
+                    + {isAdmin ? 'New Product' : 'New Application'}
                 </StyledButton>
               <StyledButton 
                 variant="text" 

@@ -1,8 +1,8 @@
-import { Button, Drawer, FormControlLabel, Grid, IconButton, LinearProgress, MenuItem, Paper, Radio, RadioGroup, Select, TextField, Theme, Tooltip, Typography, styled, useMediaQuery, useTheme } from "@mui/material"
+import { Button, CircularProgress, Drawer, FormControlLabel, Grid, IconButton, LinearProgress, MenuItem, Paper, Radio, RadioGroup, Select, TextField, Theme, Tooltip, Typography, styled, useMediaQuery, useTheme } from "@mui/material"
 import React, { useEffect, useState } from "react"
 import { getData, postData } from "../services/fetchService"
-import { formatDate } from "../services/dateTimeService"
-import { BankLoanInterface, LoanResponse, PaymentHistoryDTO } from "../common.dto"
+import { addMonthsFormat, formatDate } from "../services/dateTimeService"
+import { BankLoanInterface, LoanResponse, PaymentHistoryDTO, ProductDetailsDTO, ProductListDTO, ProductType } from "../common.dto"
 import { Close } from "@mui/icons-material"
 
 interface CreateApplicationModalProps{
@@ -20,6 +20,8 @@ export const ApplicationDrawer: React.FC<CreateApplicationModalProps>  = ({open,
     const [customAmount, setCustomAmount] = useState('');
     const [loanProgress, setLoanProgress] = useState(0)
     const [paymentHistory, setPaymentHistory]= useState<PaymentHistoryDTO[]>([])
+    const [product, setProduct] = useState<ProductDetailsDTO>()
+    const [loading, setLoading] = useState(false)
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -55,6 +57,7 @@ export const ApplicationDrawer: React.FC<CreateApplicationModalProps>  = ({open,
     };
 
     const fetchData = async () => {
+        setLoading(true)
         const response: LoanResponse = await getData(`${BACKEND_URL}applications?id=${applicationId}`)
         setApplication(response)
         if (response) {
@@ -63,6 +66,13 @@ export const ApplicationDrawer: React.FC<CreateApplicationModalProps>  = ({open,
         }
         const paymentHistoryResponse: PaymentHistoryDTO[] = await getData(`${BACKEND_URL}payments?id=${applicationId}`)
         setPaymentHistory(paymentHistoryResponse)
+
+        const productRes: ProductListDTO = await getData(`${BACKEND_URL}products?id=${application?.productId}`)
+        if (productRes){
+            const [productDetails] = productRes.productDetails.filter((detail) => detail._id === application?.productDetailsId)
+            setProduct(productDetails)
+        }
+        setLoading(false)
     }
 
     useEffect(() => {
@@ -79,20 +89,20 @@ export const ApplicationDrawer: React.FC<CreateApplicationModalProps>  = ({open,
           hideBackdrop: true,
           keepMounted: true, 
         }}
-        sx={{
-            display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: fullScreen ? '100%' : 240 },
-          }}
         >
             <Grid style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <IconButton onClick={setClose}>
                     <Close />
                 </IconButton>
             </Grid>
-            <Paper style={{ width: fullScreen? '100%' : '50vw', height: '100%', padding: '16px' }}>
+            <Paper style={{ width: fullScreen? '100%' : '50vw', height: '100%', padding: '16px',display:'flex', justifyContent: loading ? 'center' : 'flex-start', alignItems: loading ? 'center' : 'flex-start'}}>
+                {loading &&
+                    <CircularProgress />
+                }
+                {!loading &&
                 <Grid item container flexDirection='row' display='flex' spacing={2}>
                     <Grid item xs={7} container flexDirection='column' display='flex' borderRight='0.5px Solid #ccc' style={{overflowX: 'hidden', overflowY: 'auto'}}>
-                        {application &&
+                        {application && product &&
                         <Grid item container flexDirection='column' display='flex' spacing={1}>
                             <Grid item>
                             <Typography variant="h6">Application Details</Typography>
@@ -129,6 +139,22 @@ export const ApplicationDrawer: React.FC<CreateApplicationModalProps>  = ({open,
                             <Typography><strong>Status:</strong> {application?.status}</Typography>
                             </Grid>
                         }
+
+                            <Grid item>
+                            <Typography><strong>Loan Amount:</strong> ${application?.loanAmount}</Typography>
+                            </Grid>
+
+                            <Grid item>
+                            <Typography><strong>Loan Interest Rate:</strong> {product?.interestRate}%</Typography>
+                            </Grid>
+
+                            <Grid item>
+                            <Typography><strong>Loan Term:</strong> {product?.loanTerm} Months</Typography>
+                            </Grid>
+
+                            <Grid item>
+                            <Typography><strong>Loan Completion Date:</strong> {addMonthsFormat(application.createdDate, product?.loanTerm)}</Typography>
+                            </Grid>
 
                             <Grid item>
                             <Typography><strong>Loan Amount:</strong> ${application?.loanAmount}</Typography>
@@ -226,6 +252,7 @@ export const ApplicationDrawer: React.FC<CreateApplicationModalProps>  = ({open,
                     </Grid>
                     
                 </Grid>
+            }
             </Paper>
         </Drawer>
     )

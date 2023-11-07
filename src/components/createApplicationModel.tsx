@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { TextField, MenuItem, InputAdornment, Select, FormControl, InputLabel, Box, Button, styled, CircularProgress } from '@mui/material';
 import { getData, postData } from '../services/fetchService';
+import { ProductListDTO } from '../common.dto';
 
 type FormData = {
   productId: string;
@@ -12,20 +13,6 @@ type FormData = {
   loanAmount: number;
 };
 
-type ProductList = {
-    _id: string,
-    name: string,
-    type: string,
-    productDetails: [
-        {
-            loanTerm: number,
-            interestRate: number,
-            _id: string
-        }
-    ],
-    __v: number
-}
-
 interface CreateApplicationModalProps{
     handleCloseModal: () => Promise<void>
 }
@@ -35,8 +22,8 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 const CreateApplicationForm: React.FC<CreateApplicationModalProps> = ({handleCloseModal}) => {
   const { control, handleSubmit, formState: { errors } } = useForm<FormData>();
-  const[productList, setProductList] = useState<ProductList[]>([])
-  const[product, setProduct] = useState<ProductList>()
+  const[productList, setProductList] = useState<ProductListDTO[]>([])
+  const[product, setProduct] = useState<ProductListDTO>()
   const [isSubmitLoading, setIsSubmitLoading] = useState(false)
 
   const fetchData = async () => {
@@ -104,11 +91,13 @@ const CreateApplicationForm: React.FC<CreateApplicationModalProps> = ({handleClo
                     const productObject = product.productDetails.find(detail => detail._id === selectedValue);
                     field.onChange(productObject?._id);
                 }}>
-                    {product && product.productDetails.map((details, index)=>{
-                        return(
-                            <MenuItem key={details._id} value={details._id}>{details.loanTerm} Months at Annual I/R:{details.interestRate}</MenuItem>
-                        )
-                    })}
+                    {product && [...product.productDetails]
+                      .sort((a, b) => a.loanTerm - b.loanTerm)
+                      .map((details, index) => (
+                        <MenuItem key={details._id} value={details._id}>
+                          {details.loanTerm} Months at Annual I/R: {details.interestRate}
+                        </MenuItem>
+                    ))}
                 </Select>
                 )}
             />
